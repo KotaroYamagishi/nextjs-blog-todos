@@ -2,10 +2,11 @@ import Link from "next/link";
 import Cookie from "universal-cookie";
 import { useContext } from "react";
 import { StateContext } from "../context/StateContext";
+import router from "next/router";
 
 const cookie = new Cookie();
 
-export default function Task({ task, taskDeleted }) {
+const TaskItem = ({ task, taskDeleted }) => {
   const { setSelectedTask } = useContext(StateContext);
   const deleteTask = async () => {
     await fetch(`${process.env.NEXT_PUBLIC_RESTAPI_URL}api/tasks/${task.id}`, {
@@ -16,6 +17,7 @@ export default function Task({ task, taskDeleted }) {
       },
     }).then((res) => {
       if (res.status === 401) {
+        router.push('/')
         alert("JWT Token not valid");
       }
     });
@@ -66,4 +68,6 @@ export default function Task({ task, taskDeleted }) {
       </div>
     </div>
   );
-}
+};
+
+export default TaskItem;

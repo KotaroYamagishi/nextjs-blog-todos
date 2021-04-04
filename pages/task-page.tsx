@@ -2,21 +2,23 @@ import { useEffect } from "react";
 import Layout from "../components/Layout";
 import Link from "next/link";
 import { getAllTasksData } from "../lib/tasks";
-import Task from "../components/Task";
+import TaskItem from "../components/Task";
 import useSWR from "swr";
 import StateContextProvider from "../context/StateContext";
 import TaskForm from "../components/TaskForm";
+import { Task } from "../interface";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 const apiUrl = `${process.env.NEXT_PUBLIC_RESTAPI_URL}api/list-task/`;
 
-export default function TaskPage({ staticfilterdTasks }) {
-  const { data: tasks, mutate } = useSWR(apiUrl, fetcher, {
+const TaskPage = ({ staticfilterdTasks }) => {
+  const { data: tasks, mutate } = useSWR<Task[]>(apiUrl, fetcher, {
     initialData: staticfilterdTasks,
   });
   // useSWRで取得したデータをフィルタリングしてくれる
   const filteredTasks = tasks?.sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
   // 最新情報に確実にマウントされるように、初期表示時、mutate()
   // mutate()は、dataを最新状態にしてくれる
@@ -26,13 +28,16 @@ export default function TaskPage({ staticfilterdTasks }) {
   return (
     <StateContextProvider>
       <Layout title="Task page">
+        {/* 追加・編集form */}
         <TaskForm taskCreated={mutate} />
+        {/* 記事一覧 */}
         <ul>
           {filteredTasks &&
             filteredTasks.map((task) => (
-              <Task key={task.id} task={task} taskDeleted={mutate} />
+              <TaskItem key={task.id} task={task} taskDeleted={mutate} />
             ))}
         </ul>
+        {/* 戻るボタン */}
         <Link href="/main-page">
           <div className="flex cursor-pointer mt-12">
             <svg
@@ -55,7 +60,7 @@ export default function TaskPage({ staticfilterdTasks }) {
       </Layout>
     </StateContextProvider>
   );
-}
+};
 export async function getStaticProps() {
   const staticfilterdTasks = await getAllTasksData();
 
@@ -64,3 +69,5 @@ export async function getStaticProps() {
     revalidate: 3,
   };
 }
+
+export default TaskPage;

@@ -1,10 +1,11 @@
 import { useContext } from "react";
 import { StateContext } from "../context/StateContext";
 import Cookie from "universal-cookie";
+import router from "next/router";
 
 const cookie = new Cookie();
 
-export default function TaskForm({ taskCreated }) {
+const TaskForm=({ taskCreated })=> {
   const { selectedTask, setSelectedTask } = useContext(StateContext);
   const create = async (e) => {
       // onSubmitに紐づけるため、clickが伝播しないように
@@ -18,6 +19,7 @@ export default function TaskForm({ taskCreated }) {
       },
     }).then((res) => {
       if (res.status === 401) {
+        router.push('/')
         alert("JWT Token not valid");
       }
     });
@@ -67,3 +69,5 @@ export default function TaskForm({ taskCreated }) {
     </div>
   );
 }
+
+export default TaskForm

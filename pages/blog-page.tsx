@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getAllPostsData } from "../lib/posts";
 import Post from "../components/Post";
 
-export default function BlogPage({ filteredPosts }) {
+const BlogPage=({ filteredPosts })=> {
   return (
     <Layout title="Blog page">
       <ul>
@@ -39,3 +39,4 @@ export async function getStaticProps() {
     revalidate: 3,
   };
 }
+export default BlogPage
